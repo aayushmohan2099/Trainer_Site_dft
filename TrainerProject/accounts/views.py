@@ -11,6 +11,10 @@ from django.contrib.auth.views import LoginView, LogoutView
 
 from .models import Beneficiary, MasterTrainer
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+
 # Beneficiary User/Profile Creation ModelView
 def beneficiary_register(request):
     if request.method == 'POST':
@@ -80,3 +84,15 @@ class UserLoginView(LoginView):
             return '/accounts/trainer/home/'
         else:
             return '/'  # fallback
+        
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Keep logged in
+            return redirect('beneficiary_home')  # or trainer_home
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'accounts/change_password.html', {'form': form})
