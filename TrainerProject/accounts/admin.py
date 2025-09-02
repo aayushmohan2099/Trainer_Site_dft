@@ -67,6 +67,28 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         wb.save(response)
         return response
 
+# Download format for data input
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('import-excel/', self.admin_site.admin_view(self.import_excel), name="beneficiary_import_excel"),
+            path('export-excel/', self.admin_site.admin_view(self.export_excel), name="beneficiary_export_excel"),
+            path('download-format/', self.admin_site.admin_view(self.download_format), name="beneficiary_download_format"),
+        ]
+        return custom_urls + urls
+
+    def download_format(self, request):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Beneficiaries"
+        ws.append(["UserID", "State", "District", "Block", "GP", "Village",
+                "SHG Code", "SHG Name", "Member Code", "Member Name",
+                "Marital Status", "Disability", "Bank Account", "IFSC Code"])
+        response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response["Content-Disposition"] = 'attachment; filename="beneficiary_format.xlsx"'
+        wb.save(response)
+        return response
+
 # Master Trainer Data
 class MasterTrainerAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'qualification', 'availability')
@@ -109,6 +131,26 @@ class MasterTrainerAdmin(admin.ModelAdmin):
             ])
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response["Content-Disposition"] = 'attachment; filename="trainers.xlsx"'
+        wb.save(response)
+        return response
+
+# For bulk data input format download
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('import-excel/', self.admin_site.admin_view(self.import_excel), name="trainer_import_excel"),
+            path('export-excel/', self.admin_site.admin_view(self.export_excel), name="trainer_export_excel"),
+            path('download-format/', self.admin_site.admin_view(self.download_format), name="trainer_download_format"),
+        ]
+        return custom_urls + urls
+
+    def download_format(self, request):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Trainers"
+        ws.append(["UserID", "Full Name", "Qualification", "Expertise", "Training History", "Availability"])
+        response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response["Content-Disposition"] = 'attachment; filename="trainer_format.xlsx"'
         wb.save(response)
         return response
     
