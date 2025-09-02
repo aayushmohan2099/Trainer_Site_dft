@@ -9,6 +9,8 @@ from .forms import (
 
 from django.contrib.auth.views import LoginView, LogoutView
 
+from .models import Beneficiary, MasterTrainer
+
 # Beneficiary User/Profile Creation ModelView
 def beneficiary_register(request):
     if request.method == 'POST':
@@ -58,9 +60,23 @@ def trainer_register(request):
 def trainer_home(request):
     return render(request, 'accounts/trainer_home.html')
 
-
+# Site login based on whether they are Beneficiary or MasterTrainer
 class UserLoginView(LoginView):
     template_name = 'accounts/login.html'
 
 class UserLogoutView(LogoutView):
     template_name = 'accounts/logout.html'
+
+
+class UserLoginView(LoginView):
+    template_name = 'accounts/login.html'
+
+    def get_success_url(self):
+        user = self.request.user
+        # Check role and redirect
+        if hasattr(user, 'beneficiary'):
+            return '/accounts/beneficiary/home/'
+        elif hasattr(user, 'mastertrainer'):
+            return '/accounts/trainer/home/'
+        else:
+            return '/'  # fallback
