@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Beneficiary, MasterTrainer
+
+admin.site.register(Beneficiary)
+admin.site.register(MasterTrainer)
+
