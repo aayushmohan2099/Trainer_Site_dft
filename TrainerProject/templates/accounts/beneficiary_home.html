@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Beneficiary Home{% endblock %}
+{% block content %}
+<div class="card shadow p-4">
+  <h2>Welcome, {{ request.user.username }} 👋</h2>
+  <p class="text-muted">You are logged in as a Beneficiary.</p>
+
+  <h4 class="mt-3">Your Profile</h4>
+  <ul class="list-group">
+    <li class="list-group-item"><b>SHG Name:</b> {{ request.user.beneficiary.shg_name }}</li>
+    <li class="list-group-item"><b>Member Name:</b> {{ request.user.beneficiary.member_name }}</li>
+    <li class="list-group-item"><b>Village:</b> {{ request.user.beneficiary.village }}</li>
+    <li class="list-group-item"><b>Marital Status:</b> {{ request.user.beneficiary.marital_status }}</li>
+    <li class="list-group-item"><b>Bank Account:</b> {{ request.user.beneficiary.bank_account_no }}</li>
+  </ul>
+</div>
+{% endblock %}
