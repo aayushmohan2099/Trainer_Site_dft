@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Edit Beneficiary Login{% endblock %}
+{% block content %}
+<div class="card shadow p-4 col-md-8 mx-auto">
+  <h3>Modify Beneficiary Login: {{ b.member_name }}</h3>
+  <form method="post" class="mb-4">
+    {% csrf_token %}
+    <h5>Login Info</h5>
+    {{ user_form.as_p }}
+    <button class="btn btn-primary">Save Username / Profile</button>
+  </form>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="reset_password" value="1" />
+    <h5>Reset Password</h5>
+    {{ pwd_form.as_p }}
+    <button class="btn btn-warning">Set New Password</button>
+  </form>
+</div>
+{% endblock %}

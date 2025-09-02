@@ -34,8 +34,11 @@ def generate_password(length=8):
 
 # Beneficiary Data
 class BeneficiaryAdmin(admin.ModelAdmin):
-    list_display = ('member_name', 'shg_name', 'village', 'marital_status')
+    list_display = ('member_name', 'shg_name', 'village', 'marital_status', 'user_username', 'temp_password')
     change_list_template = "admin/beneficiary_changelist.html"
+
+    def user_username(self, obj): return obj.user.username
+    user_username.short_description = "Username"
 
     def get_urls(self):
         urls = super().get_urls()
@@ -75,7 +78,7 @@ class BeneficiaryAdmin(admin.ModelAdmin):
                         shg_code=row[6], shg_name=row[7],
                         member_code=row[8], member_name=row[9],
                         marital_status=row[10], disability_status=row[11],
-                        bank_account_no=row[12], ifsc_code=row[13]
+                        bank_account_no=row[12], ifsc_code=row[13], temp_password=password
                     )
 
                 self.message_user(request, "Beneficiaries imported successfully!")
@@ -88,15 +91,14 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Beneficiaries"
-        ws.append(["UserID", "State", "District", "Block", "GP", "Village",
-                   "SHG Code", "SHG Name", "Member Code", "Member Name",
-                   "Marital Status", "Disability", "Bank Account", "IFSC Code"])
-        for b in Beneficiary.objects.all():
-            ws.append([
-                b.user.id, b.state, b.district, b.block, b.gram_panchayat, b.village,
-                b.shg_code, b.shg_name, b.member_code, b.member_name,
-                b.marital_status, b.disability_status, b.bank_account_no, b.ifsc_code
-            ])
+        ws.append(["Username", "Temp Password", "State", "District", "Block", "GP", "Village",
+           "SHG Code", "SHG Name", "Member Code", "Member Name",
+           "Marital Status", "Disability", "Bank Account", "IFSC Code"])
+        
+        for b in Beneficiary.objects.select_related('user'):
+            ws.append([b.user.username, b.temp_password, b.state, b.district, b.block, b.gram_panchayat,
+                    b.village, b.shg_code, b.shg_name, b.member_code, b.member_name,
+                    b.marital_status, b.disability_status, b.bank_account_no, b.ifsc_code])
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response["Content-Disposition"] = 'attachment; filename="beneficiaries.xlsx"'
         wb.save(response)
@@ -117,8 +119,11 @@ class BeneficiaryAdmin(admin.ModelAdmin):
 
 # Master Trainer Data
 class MasterTrainerAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'qualification', 'availability')
+    list_display = ('full_name', 'qualification', 'availability', 'user_username', 'temp_password')
     change_list_template = "admin/trainer_changelist.html"
+
+    def user_username(self, obj): return obj.user.username
+    user_username.short_description = "Username"
 
     def get_urls(self):
         urls = super().get_urls()
@@ -146,8 +151,8 @@ class MasterTrainerAdmin(admin.ModelAdmin):
                         defaults={
                             "email": f"{username}@example.com",
                             "password": make_password(password),
-                            "first_name": row[9].split(" ")[0] if row[9] else "",
-                            "last_name": row[9].split(" ")[-1] if row[9] else "",
+                            "first_name": row[1].split(" ")[0] if row[1] else "",
+                            "last_name": row[1].split(" ")[-1] if row[1] else "",
                         }
                     )
 
@@ -157,7 +162,7 @@ class MasterTrainerAdmin(admin.ModelAdmin):
                         qualification=row[2],
                         expertise=row[3],
                         training_history=row[4],
-                        availability=row[5]
+                        availability=row[5], temp_password=password
                     )
                 self.message_user(request, "Trainers imported successfully!")
                 return redirect("..")
@@ -169,12 +174,11 @@ class MasterTrainerAdmin(admin.ModelAdmin):
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Trainers"
-        ws.append(["UserID", "Full Name", "Qualification", "Expertise", "Training History", "Availability"])
-        for t in MasterTrainer.objects.all():
-            ws.append([
-                t.user.id, t.full_name, t.qualification, t.expertise,
-                t.training_history, t.availability
-            ])
+        ws.append(["Username", "Temp Password", "Full Name", "Qualification", "Expertise", "Training History", "Availability"])
+
+        for t in MasterTrainer.objects.select_related('user'):
+            ws.append([t.user.username, t.temp_password, t.full_name, t.qualification, t.expertise,
+                    t.training_history, t.availability])
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response["Content-Disposition"] = 'attachment; filename="trainers.xlsx"'
         wb.save(response)

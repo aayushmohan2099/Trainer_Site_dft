@@ -1,30 +1,51 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}VO Dashboard{% endblock %}
 {% block content %}
-<div class="card p-4">
-  <h2>Village Organizer Dashboard ({{ request.user.username }})</h2>
-  <p class="text-muted">Managing village: {{ request.user.villageorganizer.village }}</p>
+<div class="card shadow p-4">
+  <h3>Village Organizer Dashboard</h3>
+  <p class="text-muted">Village: <b>{{ request.user.villageorganizer.village }}</b></p>
 
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Member Name</th>
-        <th>SHG</th>
-        <th>Village</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Member Name</th>
+          <th>SHG</th>
+          <th>District</th>
+          <th>Block</th>
+          <th>GP</th>
+          <th>Village</th>
+          <th>Marital</th>
+          <th>Disability</th>
+          <th>Bank</th>
+          <th>IFSC</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
       {% for b in beneficiaries %}
-      <tr>
-        <td>{{ b.member_name }}</td>
-        <td>{{ b.shg_name }}</td>
-        <td>{{ b.village }}</td>
-        <td>
-          <a href="{% url 'change_password' %}" class="btn btn-sm btn-warning">Reset Password</a>
-        </td>
-      </tr>
+        <tr>
+          <td>{{ b.user.username }}</td>
+          <td>{{ b.member_name }}</td>
+          <td>{{ b.shg_name }}</td>
+          <td>{{ b.district }}</td>
+          <td>{{ b.block }}</td>
+          <td>{{ b.gram_panchayat }}</td>
+          <td>{{ b.village }}</td>
+          <td>{{ b.marital_status }}</td>
+          <td>{{ b.disability_status }}</td>
+          <td>{{ b.bank_account_no }}</td>
+          <td>{{ b.ifsc_code }}</td>
+          <td>
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'vo_edit_beneficiary' b.id %}">Modify Login</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="12" class="text-center text-muted">No beneficiaries found.</td></tr>
       {% endfor %}
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

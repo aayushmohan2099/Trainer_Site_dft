@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import Beneficiary, MasterTrainer
 
+from django.contrib.auth.forms import SetPasswordForm
+
 # Beneficiary Login Registration (User Creation)
 class BeneficiaryRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -34,3 +36,16 @@ class MasterTrainerProfileForm(forms.ModelForm):
     class Meta:
         model = MasterTrainer
         fields = ['full_name', 'qualification', 'expertise', 'training_history', 'availability']
+
+# Profile Edit page
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email"]
+
+
+# Giving VO the option to set creds for any beneficiary
+class VOUserEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email"]

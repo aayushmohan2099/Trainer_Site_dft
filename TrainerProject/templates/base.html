@@ -10,7 +10,19 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Training Portal</a>
+    <a class="navbar-brand" href="/">Training Portal</a>
+    <div class="d-flex">
+      {% if request.user.is_authenticated %}
+        <a class="btn btn-outline-light me-2" href="{% url 'edit_profile' %}">Modify Login/Profile</a>
+        <a class="btn btn-warning me-2" href="{% url 'change_password' %}">Change Password</a>
+          <form action="{% url 'logout' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Logout</button>
+          </form>
+      {% else %}
+        <a class="btn btn-light" href="{% url 'login' %}">Login</a>
+      {% endif %}
+    </div>
   </div>
 </nav>
 

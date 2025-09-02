@@ -33,6 +33,8 @@ class Beneficiary(models.Model):
     bank_account_no = models.CharField(max_length=50, blank=True, null=True)
     ifsc_code = models.CharField(max_length=20, blank=True, null=True)
 
+    temp_password = models.CharField(max_length=64, blank=True, null=True)  # demo only!
+
     def __str__(self):
         return f"{self.member_name} ({self.shg_name})"
 
@@ -46,6 +48,8 @@ class MasterTrainer(models.Model):
     training_history = models.TextField(blank=True, null=True)
     availability = models.CharField(max_length=200, help_text="e.g. Weekdays, Weekends")
 
+    temp_password = models.CharField(max_length=64, blank=True, null=True)  # demo only!
+
     def __str__(self):
         return self.full_name
     
@@ -56,6 +60,6 @@ class VillageOrganizer(models.Model):
     village = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"VO - {self.user.username} ({self.village})"
+        return f"VO {self.user.username} - {self.village}"
 
 
