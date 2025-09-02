@@ -14,10 +14,21 @@ from django.urls import reverse
 
 from django.contrib.auth.models import User
 
+import random, string
+from django.contrib.auth.hashers import make_password
+
 # Excel -> DB Upload Form
 class ExcelUploadForm(forms.Form):
     file = forms.FileField()
 
+# Generating Random Usernames and Passwords for new users
+
+def generate_username(prefix, num):
+    return f"{prefix}{num}{random.randint(1000,9999)}"
+
+def generate_password(length=8):
+    chars = string.ascii_letters + string.digits + "!@#$%^&*"
+    return ''.join(random.choice(chars) for _ in range(length))
 
 # Custom Admin Portal for Import/Export of Bulk Data
 
@@ -42,10 +53,19 @@ class BeneficiaryAdmin(admin.ModelAdmin):
                 wb = openpyxl.load_workbook(form.cleaned_data['file'])
                 sheet = wb.active
                 for row in sheet.iter_rows(min_row=2, values_only=True):
+                    # Random credentials for new users
+                    username = generate_username("benef", row[0])
+                    password = generate_password()
+
                     # If Not exist, Create 1 or fetch if already exists
                     user, created = User.objects.get_or_create(
-                        username=f"user{row[0]}",
-                        defaults={"email": f"user{row[0]}@example.com"}
+                        username=username,
+                        defaults={
+                            "email": f"{username}@example.com",
+                            "password": make_password(password),
+                            "first_name": row[9].split(" ")[0] if row[9] else "",
+                            "last_name": row[9].split(" ")[-1] if row[9] else "",
+                        }
                     )
 
                     Beneficiary.objects.create(
@@ -116,9 +136,19 @@ class MasterTrainerAdmin(admin.ModelAdmin):
                 wb = openpyxl.load_workbook(form.cleaned_data['file'])
                 sheet = wb.active
                 for row in sheet.iter_rows(min_row=2, values_only=True):
+                    # Random credentials for new users
+                    username = generate_username("trainer", row[0])
+                    password = generate_password()
+
+                    # If Not exist, Create 1 or fetch if already exists                    
                     user, created = User.objects.get_or_create(
-                        username=f"trainer{row[0]}",
-                        defaults={"email": f"trainer{row[0]}@example.com"}
+                        username=username,
+                        defaults={
+                            "email": f"{username}@example.com",
+                            "password": make_password(password),
+                            "first_name": row[9].split(" ")[0] if row[9] else "",
+                            "last_name": row[9].split(" ")[-1] if row[9] else "",
+                        }
                     )
 
                     MasterTrainer.objects.create(

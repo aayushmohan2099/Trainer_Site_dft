@@ -35,3 +35,17 @@ Basic Home Page (only visible after login)
 3) Master Trainer Login + Homepage (for demo)
     - Separate login for Master Trainers.
     - Trainer homepage showing qualifications, expertise, and availability (from URS dataset).
+
+- Problems Faced,
+------------------
+
+1) Import/Export not appearinmg in the admin Page
+2) Foreign key Problems
+3) The imported users have no password so no way of login
+4) They have no first and last name
+
+- New Model Needed!
+-----------------------
+
+VO (Village Organizer model to supervise and create overview of beneficiaries to reset their uname and pass)
+
