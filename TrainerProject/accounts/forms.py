@@ -11,7 +11,7 @@ class BeneficiaryRegistrationForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
 
-# Beneficiary Profile Registration
+# Beneficiary Profile Creations
 class BeneficiaryProfileForm(forms.ModelForm):
     class Meta:
         model = Beneficiary
