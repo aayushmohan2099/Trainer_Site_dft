@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4">
+  <h2>Village Organizer Dashboard ({{ request.user.username }})</h2>
+  <p class="text-muted">Managing village: {{ request.user.villageorganizer.village }}</p>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Member Name</th>
+        <th>SHG</th>
+        <th>Village</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in beneficiaries %}
+      <tr>
+        <td>{{ b.member_name }}</td>
+        <td>{{ b.shg_name }}</td>
+        <td>{{ b.village }}</td>
+        <td>
+          <a href="{% url 'change_password' %}" class="btn btn-sm btn-warning">Reset Password</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -15,6 +15,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 
+from .models import Beneficiary, VillageOrganizer
+from django.contrib.admin.views.decorators import staff_member_required
+
 # Beneficiary User/Profile Creation ModelView
 def beneficiary_register(request):
     if request.method == 'POST':
@@ -96,3 +99,14 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'accounts/change_password.html', {'form': form})
+
+#  VO Dashboard
+@login_required
+def vo_dashboard(request):
+    try:
+        vo = request.user.villageorganizer
+    except VillageOrganizer.DoesNotExist:
+        return redirect('login')  # Not a VO
+
+    beneficiaries = Beneficiary.objects.filter(village=vo.village)
+    return render(request, 'accounts/vo_dashboard.html', {'beneficiaries': beneficiaries})

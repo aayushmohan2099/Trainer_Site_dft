@@ -48,4 +48,14 @@ class MasterTrainer(models.Model):
 
     def __str__(self):
         return self.full_name
+    
+
+#  Village Organizer (VO) model
+class VillageOrganizer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    village = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"VO - {self.user.username} ({self.village})"
+
 

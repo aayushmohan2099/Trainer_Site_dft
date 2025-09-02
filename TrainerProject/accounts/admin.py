@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Beneficiary, MasterTrainer
+from .models import Beneficiary, MasterTrainer, VillageOrganizer
 
 from django import forms
 from django.shortcuts import render, redirect
@@ -194,3 +194,4 @@ class MasterTrainerAdmin(admin.ModelAdmin):
 
 admin.site.register(Beneficiary, BeneficiaryAdmin)
 admin.site.register(MasterTrainer, MasterTrainerAdmin)
+admin.site.register(VillageOrganizer)
