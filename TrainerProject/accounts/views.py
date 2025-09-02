@@ -7,6 +7,7 @@ from .forms import (
     MasterTrainerRegistrationForm, MasterTrainerProfileForm
 )
 
+from django.contrib.auth.views import LoginView, LogoutView
 
 # Beneficiary User/Profile Creation ModelView
 def beneficiary_register(request):
@@ -56,3 +57,10 @@ def trainer_register(request):
 
 def trainer_home(request):
     return render(request, 'accounts/trainer_home.html')
+
+
+class UserLoginView(LoginView):
+    template_name = 'accounts/login.html'
+
+class UserLogoutView(LogoutView):
+    template_name = 'accounts/logout.html'
