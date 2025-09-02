@@ -9,6 +9,11 @@ import openpyxl
 
 from django.http import HttpResponse
 
+from django.utils.html import format_html
+from django.urls import reverse
+
+from django.contrib.auth.models import User
+
 # Excel -> DB Upload Form
 class ExcelUploadForm(forms.Form):
     file = forms.FileField()
@@ -19,12 +24,14 @@ class ExcelUploadForm(forms.Form):
 # Beneficiary Data
 class BeneficiaryAdmin(admin.ModelAdmin):
     list_display = ('member_name', 'shg_name', 'village', 'marital_status')
+    change_list_template = "admin/beneficiary_changelist.html"
 
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path('import-excel/', self.admin_site.admin_view(self.import_excel), name="beneficiary_import_excel"),
             path('export-excel/', self.admin_site.admin_view(self.export_excel), name="beneficiary_export_excel"),
+            path('download-format/', self.admin_site.admin_view(self.download_format), name="beneficiary_download_format"),
         ]
         return custom_urls + urls
 
@@ -35,14 +42,22 @@ class BeneficiaryAdmin(admin.ModelAdmin):
                 wb = openpyxl.load_workbook(form.cleaned_data['file'])
                 sheet = wb.active
                 for row in sheet.iter_rows(min_row=2, values_only=True):
-                    Beneficiary.objects.create(
-                        user_id=row[1], state=row[2], district=row[3],
-                        block=row[4], gram_panchayat=row[5], village=row[6],
-                        shg_code=row[7], shg_name=row[8], member_code=row[9],
-                        member_name=row[10], marital_status=row[11],
-                        disability_status=row[12], bank_account_no=row[13],
-                        ifsc_code=row[14]
+                    # If Not exist, Create 1 or fetch if already exists
+                    user, created = User.objects.get_or_create(
+                        username=f"user{row[0]}",
+                        defaults={"email": f"user{row[0]}@example.com"}
                     )
+
+                    Beneficiary.objects.create(
+                        user=user,
+                        state=row[1], district=row[2], block=row[3],
+                        gram_panchayat=row[4], village=row[5],
+                        shg_code=row[6], shg_name=row[7],
+                        member_code=row[8], member_name=row[9],
+                        marital_status=row[10], disability_status=row[11],
+                        bank_account_no=row[12], ifsc_code=row[13]
+                    )
+
                 self.message_user(request, "Beneficiaries imported successfully!")
                 return redirect("..")
         else:
@@ -68,19 +83,10 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         return response
 
 # Download format for data input
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('import-excel/', self.admin_site.admin_view(self.import_excel), name="beneficiary_import_excel"),
-            path('export-excel/', self.admin_site.admin_view(self.export_excel), name="beneficiary_export_excel"),
-            path('download-format/', self.admin_site.admin_view(self.download_format), name="beneficiary_download_format"),
-        ]
-        return custom_urls + urls
-
     def download_format(self, request):
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Beneficiaries"
+        ws.title = "Beneficiary Format"
         ws.append(["UserID", "State", "District", "Block", "GP", "Village",
                 "SHG Code", "SHG Name", "Member Code", "Member Name",
                 "Marital Status", "Disability", "Bank Account", "IFSC Code"])
@@ -92,12 +98,14 @@ class BeneficiaryAdmin(admin.ModelAdmin):
 # Master Trainer Data
 class MasterTrainerAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'qualification', 'availability')
+    change_list_template = "admin/trainer_changelist.html"
 
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path('import-excel/', self.admin_site.admin_view(self.import_excel), name="trainer_import_excel"),
             path('export-excel/', self.admin_site.admin_view(self.export_excel), name="trainer_export_excel"),
+            path('download-format/', self.admin_site.admin_view(self.download_format), name="trainer_download_format"),
         ]
         return custom_urls + urls
 
@@ -108,10 +116,18 @@ class MasterTrainerAdmin(admin.ModelAdmin):
                 wb = openpyxl.load_workbook(form.cleaned_data['file'])
                 sheet = wb.active
                 for row in sheet.iter_rows(min_row=2, values_only=True):
+                    user, created = User.objects.get_or_create(
+                        username=f"trainer{row[0]}",
+                        defaults={"email": f"trainer{row[0]}@example.com"}
+                    )
+
                     MasterTrainer.objects.create(
-                        user_id=row[1], full_name=row[2],
-                        qualification=row[3], expertise=row[4],
-                        training_history=row[5], availability=row[6]
+                        user=user,
+                        full_name=row[1],
+                        qualification=row[2],
+                        expertise=row[3],
+                        training_history=row[4],
+                        availability=row[5]
                     )
                 self.message_user(request, "Trainers imported successfully!")
                 return redirect("..")
@@ -135,19 +151,10 @@ class MasterTrainerAdmin(admin.ModelAdmin):
         return response
 
 # For bulk data input format download
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('import-excel/', self.admin_site.admin_view(self.import_excel), name="trainer_import_excel"),
-            path('export-excel/', self.admin_site.admin_view(self.export_excel), name="trainer_export_excel"),
-            path('download-format/', self.admin_site.admin_view(self.download_format), name="trainer_download_format"),
-        ]
-        return custom_urls + urls
-
     def download_format(self, request):
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Trainers"
+        ws.title = "Trainer Format"
         ws.append(["UserID", "Full Name", "Qualification", "Expertise", "Training History", "Availability"])
         response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response["Content-Disposition"] = 'attachment; filename="trainer_format.xlsx"'
